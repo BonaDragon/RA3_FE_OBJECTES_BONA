@@ -1,0 +1,53 @@
+
+        body {
+            background-color: #ccff99;
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 30px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="text"] {
+            padding: 5px;
+            width: 200px;
+            font-family: monospace;
+        }
+
+        .info {
+            margin: 15px 0;
+        }
+
+        .info strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        button {
+            background-color: #ccff66;
+            border: 1px solid #99cc33;
+            padding: 10px 20px;
+            margin: 10px;
+            font-family: monospace;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #b3ff66;
+        }
+   
