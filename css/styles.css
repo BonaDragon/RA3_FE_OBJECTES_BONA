@@ -1,53 +1,75 @@
-
-        body {
-            background-color: #ccff99;
-            font-family: monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            text-align: center;
-            padding: 30px;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-
-        input[type="text"] {
-            padding: 5px;
-            width: 200px;
-            font-family: monospace;
-        }
-
-        .info {
-            margin: 15px 0;
-        }
-
-        .info strong {
-            display: block;
-            margin-bottom: 3px;
-        }
-
-        button {
-            background-color: #ccff66;
-            border: 1px solid #99cc33;
-            padding: 10px 20px;
-            margin: 10px;
-            font-family: monospace;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #b3ff66;
-        }
+body {
    
+    font-size: larger;
+    font-family: monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+    padding: 30px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+input[type="text"] {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 5px;
+    width: 250px;
+    font-family: monospace;
+}
+
+.info {
+    margin: 15px 0;
+}
+
+.info strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+button {
+    background-color: #ccff66;
+    border: 1px solid #99cc33;
+    padding: 10px 20px;
+    margin: 10px;
+    font-family: monospace;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #b3ff66;
+}
+
+.chrome-bg {
+    background-color: #ccff99;
+    /* azul */
+}
+
+.firefox-bg {
+    background-color: #FF7139;
+    /* naranja */
+}
+
+.safari-bg {
+    background-color: #00A1F1;
+    /* celeste */
+}
+
+.edge-bg {
+    background-color: #0078D7;
+    /* azul Edge */
+}
+
