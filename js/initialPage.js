@@ -1,4 +1,5 @@
 //CONSTANTS IMMUTABLES 
+
 const config = {
     lang: "",
     userAgent: "",
@@ -24,13 +25,13 @@ const info = document.querySelector(".info p");
 const body = document.body;
 
 
-//VARIABLES DEL JOC
+//VARIABLES 
 
 let backgroundColor = "";
 let points = localStorage.getItem("points");
 
-//DEFINIR FUNCIONS
 
+//DEFINIR FUNCIONS
 
 const init = function () {
 
@@ -38,27 +39,25 @@ const init = function () {
     info.textContent = href;
     score.textContent = !points ? "No hi ha puntuacio actual" : points;
 
-    if (navigator.userAgent.includes("Chrome")) {
+    if (navigator.userAgent.includes("Edg")) {
+        navegador.textContent = "Edge";
+        backgroundColor = "edge-bg";
+    } else if (navigator.userAgent.includes("Chrome")) {
         navegador.textContent = "Chrome";
         backgroundColor = "chrome-bg";
     } else if (navigator.userAgent.includes("Firefox")) {
         navegador.textContent = "Firefox";
-         backgroundColor = "firefox-bg";
-    } else if (navigator.userAgent.includes("Safari") && !navigator.userAgent.includes("Chrome")) {
-        navegador.textContent = "Safari";
-         backgroundColor = "safari-bg";
-    } else if (navigator.userAgent.includes("Edge")) {
-        navegador.textContent = "Edge";
-         backgroundColor = "edge-bg";
+        backgroundColor = "firefox-bg";
     }
 
-   body.classList.add(backgroundColor);
+
+    body.classList.add(backgroundColor);
 
 }
 
 const saveName = function () {
 
-    document.cookie = "name=" + inputNameObj.value;
+    document.cookie = "name=" + inputNameObj.value + "; path=/";
 }
 
 
@@ -78,13 +77,17 @@ const startGame = function () {
 
 const resetPoints = function () {
 
-    localStorage.removeItem("points");
-    score.textContent = "0";
+    const confirmation = confirm("Estàs segur que vols eliminar la informació de la puntuació?");
+
+    if (confirmation) {
+
+        localStorage.removeItem("points");
+        score.textContent = "No hi ha puntuacio actual";
+
+    }
+
 
 }
-
-
-
 
 
 //ADDEVENTLISTENERS

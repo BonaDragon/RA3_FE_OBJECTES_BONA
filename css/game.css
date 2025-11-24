@@ -1,0 +1,130 @@
+/* ---------------------- Layout general ---------------------- */
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #d3c99d; 
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #b4f0af; 
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header button {
+    background-color: #90ee90;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+header input {
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.title {
+    text-align: center;
+    font-size: 56px;
+    background-color: #c3c9f5; /* Light purple */
+    margin: 20px;
+    padding: 40px 20px; /* Aumenta el padding vertical para más altura */
+    border-radius: 10px;
+    min-height: 100px; /* opcional: asegura altura mínima */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 15px;    /* Space letter */
+    
+}
+
+/* ---------------------- Game container ---------------------- */
+.game-container {
+    display: flex;
+    justify-content: space-between; /* Scoreboard a la izquierda, imagen al centro */
+    align-items: center;
+    margin: 20px;
+    flex-wrap: wrap;
+    width: 100%; /* ocupa todo el ancho de la pantalla */
+}
+
+/* Scoreboard a la izquierda */
+.scoreboard {
+    background-color: #b26b6b;
+    color: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 300px;
+    flex-shrink: 0;
+   
+    /* Centrado */
+    display: flex;
+    flex-direction: column; /* apilar elementos verticalmente */
+    justify-content: center; /* centra verticalmente */
+    align-items: center; /* centra horizontalmente */
+    text-align: center; /* por si hay párrafos */
+}
+
+/* Imagen centrada */
+.game-box {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 500px;
+    max-width: 50%; 
+    text-align: center;
+    justify-content: center;
+    margin-right: 45rem ;
+    border: solid 1px;
+   
+}
+
+/* Alfabeto ocupando todo el ancho */
+.alphabet {
+    display: flex;
+    justify-content: space-between; /* A a la izquierda, Z a la derecha */
+    flex-wrap: wrap;
+    margin: 20px 10px; /* margen lateral */
+}
+
+.alphabet button {
+    background-color: #90ee90;
+    border: none;
+    flex: 1 0 40px; /* crece si hay espacio, mínimo 40px */
+    max-width: 60px;
+    height: 60px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 40px; /* <- aumenta el tamaño de la letra */
+    border: solid 1px;
+}
+
+.input-container {
+    position: relative; /* para posicionar el botón encima del input */
+    display: inline-block;
+}
+
+.input-container input {
+    padding-right: 40px; /* espacio para el botón de ojo */
+    font-size: 16px;
+}
+
+.input-container button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;    /* quita el fondo */
+    border: none;        /* quita el borde */
+    padding: 0;          /* quita padding extra */
+    cursor: pointer;
+    font-size: 18px;     /* tamaño del emoji */
+}
