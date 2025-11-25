@@ -18,13 +18,20 @@ const input = document.querySelector(".input-container input");
 const eyeBtn = document.querySelector(".input-container button");
 const startGameBtnObj = document.getElementById("startGame");
 const title = document.querySelector(".title");
+const puntsPartidesActuals = document.querySelector('.partidesActuals');
+const totalPartides = document.querySelector('.totalPartides');
+const partidesGuanyades = document.querySelector('.partidesGuanyades');
+const partidaMesPunts = document.querySelector('.partidaMesPunts');
 
 
 //VARIABLES DEL JOC
 
 let hiddenWord = [];
 let shownWord = [];
-let plays = 0;
+let points = 0;
+let times = 0;
+let streak = 0;
+let games =0;
 
 //DEFINIR FUNCIONS
 const help = function () {
@@ -47,8 +54,8 @@ const loadSecretWord = function () {
     }
 
 
-
 }
+
 
 const getValueCookies = function (clauSeleccio) {
     const cookies = document.cookie.split(';');
@@ -71,6 +78,46 @@ const init = function () {
     scoreboardSpanObj.textContent = getValueCookies("name");
 }
 
+const jugada = function(letter, obj) {
+    obj.disabled = true;
+    let found = false;
+    let times = 0;
+
+    for (let j = 0; j < hiddenWord.length; j++) {
+        if (hiddenWord[j] === letter) {
+            shownWord[j] = letter;
+            found = true;
+            times++;
+        }
+    }
+
+    if (found) {
+        streak++;  
+
+        if (times === 1) {
+            points += streak;  
+        } else if (times > 1) {
+            points *= 2; 
+        }
+    } else {
+        streak = 0;
+        if (points > 0) points -= 1; 
+    }
+
+    puntsPartidesActuals.textContent = points;
+    title.textContent = shownWord.join(" ");
+
+    if (!shownWord.includes('_')) {
+    
+        totalPartides.textContent = ++games;
+        title.style.backgroundColor = "#70b578";
+    
+}
+}
+
+
+
+
 const loadMenu = function () {
 
     for (let i = 0; i < letters.length; i++) {
@@ -78,19 +125,8 @@ const loadMenu = function () {
         const buttonCreated = document.createElement("button");
         buttonCreated.textContent = letters[i];
         buttonCreated.addEventListener("click", function () {
-
-            for (let j = 0; j < hiddenWord.length; j++) {
-                if (hiddenWord[j] === letters[i]) {
-                    shownWord[j] = letters[i];
-
-                     plays++
-                }
-            }
-
-            title.textContent = shownWord.join(" ");
-            buttonCreated.disabled = true;
-
-        })
+            jugada(letters[i], buttonCreated);
+        });
 
         alphabet.appendChild(buttonCreated);
     }
@@ -137,8 +173,6 @@ const checkWord = function () {
 
 
 }
-
-
 
 
 
