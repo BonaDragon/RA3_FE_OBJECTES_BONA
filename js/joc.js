@@ -31,7 +31,9 @@ let shownWord = [];
 let points = 0;
 let times = 0;
 let streak = 0;
-let games =0;
+let games = 0;
+let wonGames = 0;
+let bestScore = 0;
 
 //DEFINIR FUNCIONS
 const help = function () {
@@ -68,6 +70,18 @@ const getValueCookies = function (clauSeleccio) {
     return null;
 }
 
+const enableAll = function (obj) {
+
+    for (let i = 0; i < letters.length; i++) {
+
+        obj.disabled = false;
+
+    }
+
+    input.disabled = false;
+    startGameBtnObj.disabled = false;
+}
+
 
 
 
@@ -78,7 +92,7 @@ const init = function () {
     scoreboardSpanObj.textContent = getValueCookies("name");
 }
 
-const jugada = function(letter, obj) {
+const jugada = function (letter, obj) {
     obj.disabled = true;
     let found = false;
     let times = 0;
@@ -92,27 +106,42 @@ const jugada = function(letter, obj) {
     }
 
     if (found) {
-        streak++;  
+        streak++;
 
         if (times === 1) {
-            points += streak;  
+            points += streak;
         } else if (times > 1) {
-            points *= 2; 
+            points *= 2;
         }
     } else {
         streak = 0;
-        if (points > 0) points -= 1; 
+        if (points > 0) points -= 1;
     }
 
     puntsPartidesActuals.textContent = points;
     title.textContent = shownWord.join(" ");
 
     if (!shownWord.includes('_')) {
-    
+
         totalPartides.textContent = ++games;
+        partidesGuanyades.textContent = ++wonGames;
         title.style.backgroundColor = "#70b578";
-    
-}
+
+
+        if (points > bestScore) {
+
+            partidaMesPunts.textContent = points;
+
+        }
+
+        points = 0;
+        enableAll(obj);
+
+
+
+    }
+
+
 }
 
 
