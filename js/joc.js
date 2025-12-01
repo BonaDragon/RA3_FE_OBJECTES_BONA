@@ -22,6 +22,9 @@ const puntsPartidesActuals = document.querySelector('.partidesActuals');
 const totalPartides = document.querySelector('.totalPartides');
 const partidesGuanyades = document.querySelector('.partidesGuanyades');
 const partidaMesPunts = document.querySelector('.partidaMesPunts');
+const img = document.querySelector("img");
+
+
 
 
 //VARIABLES DEL JOC
@@ -34,6 +37,8 @@ let streak = 0;
 let games = 0;
 let wonGames = 0;
 let bestScore = 0;
+let buttonList = [];
+let count = 1; //image
 
 //DEFINIR FUNCIONS
 const help = function () {
@@ -50,6 +55,8 @@ const getBack = function () {
 
 const loadSecretWord = function () {
 
+    shownWord = [];
+
     for (let i = 0; i < hiddenWord.length; i++) {
 
         shownWord.push("_");
@@ -58,6 +65,18 @@ const loadSecretWord = function () {
 
 }
 
+const showWord = function () {
+
+    shownWord = [];
+
+    for (let i = 0; i < hiddenWord.length; i++) {
+
+        shownWord.push(hiddenWord[i]);
+    }
+
+    title.textContent = shownWord.join(" ");
+
+}
 
 const getValueCookies = function (clauSeleccio) {
     const cookies = document.cookie.split(';');
@@ -70,18 +89,6 @@ const getValueCookies = function (clauSeleccio) {
     return null;
 }
 
-const enableAll = function (obj) {
-
-    for (let i = 0; i < letters.length; i++) {
-
-        obj.disabled = false;
-
-    }
-
-    input.disabled = false;
-    startGameBtnObj.disabled = false;
-}
-
 
 
 
@@ -90,16 +97,59 @@ const init = function () {
     const config = JSON.parse(sessionStorage.getItem("config"));
     spanIdiomaObj.textContent = `Idioma(${config.lang})`;
     scoreboardSpanObj.textContent = getValueCookies("name");
+
 }
 
-const jugada = function (letter, obj) {
-    obj.disabled = true;
+const enableAllLetters = function () {
+
+    const buttonsObj = document.querySelectorAll('.alphabet button');
+
+    for (var i = 0; i < buttonsObj.length; i++) {
+        buttonsObj[i].disabled = false;
+    }
+
+
+
+}
+
+const disableAllLetters = function () {
+
+    const buttonsObj = document.querySelectorAll('.alphabet button');
+
+    for (var i = 0; i < buttonsObj.length; i++) {
+        buttonsObj[i].disabled = true;
+    }
+
+}
+
+const enableInputGameButton = function () {
+
+    input.disabled = false;
+    startGameBtnObj.disabled = false;
+}
+
+const disableButtonInput = function () {
+
+    input.disabled = true;
+    startGameBtnObj.disabled = true;
+}
+
+const changeImage = function () {
+
+    count++;
+    img.src = `images/img_${count}.png`;
+
+
+}
+
+const addSubtractPoints = function (letter) {
+
     let found = false;
     let times = 0;
 
-    for (let j = 0; j < hiddenWord.length; j++) {
-        if (hiddenWord[j] === letter) {
-            shownWord[j] = letter;
+    for (let i = 0; i < hiddenWord.length; i++) {
+        if (hiddenWord[i] === letter) {
+            shownWord[i] = letter;
             found = true;
             times++;
         }
@@ -114,36 +164,67 @@ const jugada = function (letter, obj) {
             points *= 2;
         }
     } else {
+        changeImage();
         streak = 0;
         if (points > 0) points -= 1;
     }
 
     puntsPartidesActuals.textContent = points;
-    title.textContent = shownWord.join(" ");
 
-    if (!shownWord.includes('_')) {
+}
 
-        totalPartides.textContent = ++games;
-        partidesGuanyades.textContent = ++wonGames;
-        title.style.backgroundColor = "#70b578";
+const winGame = function () {
 
-
-        if (points > bestScore) {
-
-            partidaMesPunts.textContent = points;
-
-        }
-
-        points = 0;
-        enableAll(obj);
+    totalPartides.textContent = ++games;
+    partidesGuanyades.textContent = ++wonGames;
+    title.style.backgroundColor = "#70b578";
 
 
+    if (points > bestScore) {
+
+        partidaMesPunts.textContent = points;
 
     }
 
 
+    disableAllLetters();
+    enableInputGameButton();
+
 }
 
+const resetPoints = function() {
+
+     points = 0;
+    puntsPartidesActuals.textContent = points;
+}
+
+const loseGame = function () {
+
+    title.style.backgroundColor = "#ff0000ff";
+    count = 0;
+    showWord();
+    disableAllLetters();
+    enableInputGameButton();
+    
+}
+
+const jugada = function (letter, obj) {
+    obj.disabled = true;
+    addSubtractPoints(letter);
+    title.textContent = shownWord.join(" ");
+
+    if (!shownWord.includes('_')) {
+
+        winGame();
+
+    }
+
+    if (count === 9) {
+
+        loseGame();
+    }
+
+}
 
 
 
@@ -153,7 +234,10 @@ const loadMenu = function () {
 
         const buttonCreated = document.createElement("button");
         buttonCreated.textContent = letters[i];
+        buttonCreated.disabled = true;
+        buttonList.push(buttonCreated);
         buttonCreated.addEventListener("click", function () {
+
             jugada(letters[i], buttonCreated);
         });
 
@@ -161,11 +245,7 @@ const loadMenu = function () {
     }
 }
 
-const disableButtonInput = function () {
 
-    input.disabled = true;
-    startGameBtnObj.disabled = true;
-}
 
 const checkWord = function () {
 
@@ -242,7 +322,9 @@ eyeBtn.addEventListener("click", function () {
 
 startGameBtnObj.addEventListener("click", function () {
 
+    enableAllLetters();
     checkWord();
+    resetPoints();
 
 
 });
