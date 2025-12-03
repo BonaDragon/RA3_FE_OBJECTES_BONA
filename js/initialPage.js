@@ -12,7 +12,6 @@ const lan = navigator.language;
 const href = location.href;
 
 
-
 // CONSTANTS DOM
 
 const inputNameObj = document.getElementById("name");
@@ -28,16 +27,24 @@ const body = document.body;
 //VARIABLES 
 
 let backgroundColor = "";
-let points = localStorage.getItem("points");
-
 
 //DEFINIR FUNCIONS
 
+const setBestScore = function (playername, points) {
+
+
+    score.textContent = `${playername}: ${points}`;
+}
+
 const init = function () {
 
+    const localInfo = JSON.parse(localStorage.getItem("localInfo"));
+    const points = localInfo.bestScore
+    const playerName = localInfo.name
+    setBestScore(playerName, points);
     language.textContent = lan;
     info.textContent = href;
-    score.textContent = !points ? "No hi ha puntuacio actual" : points;
+    score.textContent = !points ? "No hi ha puntuacio actual" : playerName + ": " + points;
 
     if (navigator.userAgent.includes("Edg")) {
         navegador.textContent = "Edge";
@@ -54,6 +61,8 @@ const init = function () {
     body.classList.add(backgroundColor);
 
 }
+
+
 
 const saveName = function () {
 
@@ -81,7 +90,7 @@ const resetPoints = function () {
 
     if (confirmation) {
 
-        localStorage.removeItem("points");
+        localStorage.removeItem("bestScore");
         score.textContent = "No hi ha puntuacio actual";
 
     }

@@ -26,18 +26,13 @@ const img = document.querySelector("img");
 
 
 
-
 //VARIABLES DEL JOC
 
 let hiddenWord = [];
 let shownWord = [];
-let points = 0;
 let times = 0;
 let streak = 0;
-let games = 0;
-let wonGames = 0;
-let bestScore = 0;
-let buttonList = [];
+let found = false;
 let count = 1; //image
 
 //DEFINIR FUNCIONS
@@ -142,10 +137,26 @@ const changeImage = function () {
 
 }
 
+const setLocalInfo = function() {
+
+    const localInfo = {
+
+        name: player.name,
+        bestScore: player.bestScore
+    }
+
+    localStorage.setItem("localInfo", JSON.stringify(localInfo));
+}
+
+const resetTitleColor = function() {
+
+     title.style.backgroundColor = "#c3c9f5";
+}
+
 const addSubtractPoints = function (letter) {
 
-    let found = false;
-    let times = 0;
+    found = false;
+    times = 0;
 
     for (let i = 0; i < hiddenWord.length; i++) {
         if (hiddenWord[i] === letter) {
@@ -159,30 +170,38 @@ const addSubtractPoints = function (letter) {
         streak++;
 
         if (times === 1) {
-            points += streak;
+            player.points += streak;
         } else if (times > 1) {
-            points *= 2;
+           player.points *= 2;
         }
     } else {
         changeImage();
         streak = 0;
-        if (points > 0) points -= 1;
+        if (player.points > 0) player.points -= 1;
     }
 
-    puntsPartidesActuals.textContent = points;
+    puntsPartidesActuals.textContent = player.points;
 
+}
+
+const resetPoints = function() {
+
+    player.points = 0;
+    puntsPartidesActuals.textContent = player.points;
+    streak = 0;
 }
 
 const winGame = function () {
 
-    totalPartides.textContent = ++games;
-    partidesGuanyades.textContent = ++wonGames;
+    totalPartides.textContent = ++player.games;
+    partidesGuanyades.textContent = ++player.wonGames;
     title.style.backgroundColor = "#70b578";
 
 
-    if (points > bestScore) {
+    if (player.points > player.bestScore || player.bestScore == "No hi a puntuacio") {
 
-        partidaMesPunts.textContent = points;
+        partidaMesPunts.textContent = player.points;
+        player.bestScore = player.points;
 
     }
 
@@ -192,16 +211,11 @@ const winGame = function () {
 
 }
 
-const resetPoints = function() {
-
-     points = 0;
-    puntsPartidesActuals.textContent = points;
-}
 
 const loseGame = function () {
 
     title.style.backgroundColor = "#ff0000ff";
-    count = 0;
+    count = 1;
     showWord();
     disableAllLetters();
     enableInputGameButton();
@@ -216,13 +230,17 @@ const jugada = function (letter, obj) {
     if (!shownWord.includes('_')) {
 
         winGame();
+        setLocalInfo();
 
     }
 
     if (count === 9) {
 
         loseGame();
+        setLocalInfo();
     }
+
+    
 
 }
 
@@ -235,7 +253,6 @@ const loadMenu = function () {
         const buttonCreated = document.createElement("button");
         buttonCreated.textContent = letters[i];
         buttonCreated.disabled = true;
-        buttonList.push(buttonCreated);
         buttonCreated.addEventListener("click", function () {
 
             jugada(letters[i], buttonCreated);
@@ -283,11 +300,18 @@ const checkWord = function () {
 
 }
 
+// OBJ PLAYER
+const player = {
+    name: getValueCookies("name") ,
+    points: 0,
+    games: 0,
+    wonGames: 0,
+    bestScore: "No hi a puntuacio"
+}
+
 
 
 //ADDEVENTLISTENERS
-
-
 butnTornarObj.addEventListener("click", function () {
 
     getBack();
@@ -325,7 +349,7 @@ startGameBtnObj.addEventListener("click", function () {
     enableAllLetters();
     checkWord();
     resetPoints();
-
+    resetTitleColor();
 
 });
 
