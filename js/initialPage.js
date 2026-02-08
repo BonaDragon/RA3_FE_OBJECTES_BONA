@@ -135,3 +135,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+const asignatura = {
+
+    nom: "hola",
+    any: 1999
+}
+
+sessionStorage.setItem("asignatura", JSON.stringify(asignatura))
+
+const recuperacio = JSON.parse(sessionStorage.getItem("asignatura"))
+ console.log(recuperacio.any)

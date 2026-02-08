@@ -1,11 +1,5 @@
 //CONSTANTS IMMUTABLES 
 
-const letters = [
-    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
-    "N", "Ñ", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
-];
-
-
 
 
 // CONSTANTS DOM
@@ -23,6 +17,7 @@ const totalPartides = document.querySelector('.totalPartides');
 const partidesGuanyades = document.querySelector('.partidesGuanyades');
 const partidaMesPunts = document.querySelector('.partidaMesPunts');
 const img = document.querySelector("img");
+const bodyGame = document.body;
 
 
 
@@ -34,13 +29,18 @@ let times = 0;
 let streak = 0;
 let found = false;
 let count = 1; //image
+let oldGame = false;
 
 //DEFINIR FUNCIONS
-const help = function () {
+const help = async function () {
+
 
     window.open("instruccions.html", "Instruccions", "width=400,height=400");
 
 }
+
+
+
 
 const getBack = function () {
 
@@ -84,15 +84,108 @@ const getValueCookies = function (clauSeleccio) {
     return null;
 }
 
+const updateRecord = async function (finished) {
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/record", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                totalGames: player.games,
+                wins: player.wonGames,
+                maxPoints: typeof player.bestScore === "number" ? player.bestScore : 0,
+                finished: finished
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Error backend:", errorText);
+            return;
+        }
+
+        const data = await response.json();
+        console.log("Record actualizado:", data);
+
+    } catch (error) {
+        console.error("PUT fallido:", error);
+    }
+};
+
+const createRecord = async function () {
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/record", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                totalPoints: player.points,
+                totalGames: player.games,
+                wins: player.wonGames,
+                maxPoints: player.bestScore,
+                language: navigator.language.split("-")[0],
+                finished: false
+            })
+        });
+
+        if (!response.ok) throw new Error("Error al crear record");
+
+        const data = await response.json();
+        console.log("Record creado:", data);
+
+        oldGame = true; // 🔥 Muy importante
+    } catch (error) {
+        console.error("POST fallido:", error);
+    }
+};
 
 
 
-const init = function () {
+const init = async function () {
+    try {
+        const config = JSON.parse(sessionStorage.getItem("config"));
+        spanIdiomaObj.textContent = `Idioma(${config.lang})`;
+        scoreboardSpanObj.textContent = getValueCookies("name");
 
-    const config = JSON.parse(sessionStorage.getItem("config"));
-    spanIdiomaObj.textContent = `Idioma(${config.lang})`;
-    scoreboardSpanObj.textContent = getValueCookies("name");
+        const resposta = await fetch("http://127.0.0.1:8000/api/record");
+        if (!resposta.ok) {
+            console.log("No hay record, creando partida nueva...");
+            await createRecord(); // esperar a que se cree
+            player.games = 0;
+            player.wonGames = 0;
+            player.bestScore = 0;
+            totalPartides.textContent = 0;
+            partidesGuanyades.textContent = 0;
+            partidaMesPunts.textContent = 0;
+            return;
+        }
 
+        const objJson = await resposta.json();
+        player.games = objJson.totalGames;
+        player.wonGames = objJson.wins;
+        player.bestScore = objJson.maxPoints;
+
+        totalPartides.textContent = player.games;
+        partidesGuanyades.textContent = player.wonGames;
+        partidaMesPunts.textContent = player.bestScore;
+
+        oldGame = objJson.finished === false;
+
+    } catch (error) {
+        console.log("Error al cargar record, creando partida nueva...");
+        await createRecord();
+        player.games = 0;
+        player.wonGames = 0;
+        player.bestScore = 0;
+        totalPartides.textContent = 0;
+        partidesGuanyades.textContent = 0;
+        partidaMesPunts.textContent = 0;
+    }
+};
+
+const changeBackgroundColor = function () {
+
+    bodyGame.classList.add(config.bgColorClass);
 }
 
 const enableAllLetters = function () {
@@ -137,7 +230,7 @@ const changeImage = function () {
 
 }
 
-const setLocalInfo = function() {
+const setLocalInfo = function () {
 
     const localInfo = {
 
@@ -148,9 +241,9 @@ const setLocalInfo = function() {
     localStorage.setItem("localInfo", JSON.stringify(localInfo));
 }
 
-const resetTitleColor = function() {
+const resetTitleColor = function () {
 
-     title.style.backgroundColor = "#c3c9f5";
+    title.style.backgroundColor = "#c3c9f5";
 }
 
 const addSubtractPoints = function (letter) {
@@ -170,9 +263,9 @@ const addSubtractPoints = function (letter) {
         streak++;
 
         if (times === 1) {
-            player.points += streak;
+            player.points += 3;
         } else if (times > 1) {
-           player.points *= 2;
+            player.points *= 2;
         }
     } else {
         changeImage();
@@ -184,7 +277,7 @@ const addSubtractPoints = function (letter) {
 
 }
 
-const resetPoints = function() {
+const resetPoints = function () {
 
     player.points = 0;
     puntsPartidesActuals.textContent = player.points;
@@ -193,6 +286,7 @@ const resetPoints = function() {
 
 const winGame = function () {
 
+    count = 1;
     totalPartides.textContent = ++player.games;
     partidesGuanyades.textContent = ++player.wonGames;
     title.style.backgroundColor = "#70b578";
@@ -203,23 +297,48 @@ const winGame = function () {
         partidaMesPunts.textContent = player.points;
         player.bestScore = player.points;
 
+
     }
 
 
     disableAllLetters();
     enableInputGameButton();
 
+    if (oldGame) {
+
+        updateRecord(true);
+    } else {
+
+        createRecord();
+    }
+
+
+
 }
 
 
 const loseGame = function () {
 
+    totalPartides.textContent = ++player.games;
     title.style.backgroundColor = "#ff0000ff";
     count = 1;
     showWord();
     disableAllLetters();
     enableInputGameButton();
-    
+
+
+    if (!oldGame) {
+
+        createRecord();
+    } else {
+
+        updateRecord(true);
+    }
+
+
+
+
+
 }
 
 const jugada = function (letter, obj) {
@@ -234,67 +353,75 @@ const jugada = function (letter, obj) {
 
     }
 
-    if (count === 9) {
+    if (count === 6) {
 
         loseGame();
         setLocalInfo();
     }
 
-    
 
+
+}
+
+const createButtonsByLanguage = function (data) {
+
+
+    const buttonCreated = document.createElement("button");
+    buttonCreated.textContent = data;
+    buttonCreated.disabled = true;
+    buttonCreated.addEventListener("click", function () {
+
+        jugada(data, buttonCreated);
+    });
+
+    alphabet.appendChild(buttonCreated);
 }
 
 
 
-const loadMenu = function () {
+const loadMenu = async function () {
 
-    for (let i = 0; i < letters.length; i++) {
+    try {
 
-        const buttonCreated = document.createElement("button");
-        buttonCreated.textContent = letters[i];
-        buttonCreated.disabled = true;
-        buttonCreated.addEventListener("click", function () {
+        const idioma = navigator.language
+        const idiomaBase = idioma.split("-")[0];
+        const resposta = await fetch(`http://127.0.0.1:8000/api/alphabet/${idiomaBase}`);
+        const objJson = await resposta.json();
 
-            jugada(letters[i], buttonCreated);
-        });
+        for (let i = 0; i < objJson.length; i++) {
 
-        alphabet.appendChild(buttonCreated);
-    }
-}
+            createButtonsByLanguage(objJson[i].letter);
 
 
-
-const checkWord = function () {
-
-    for (let i = 0; i < input.value.length; i++) {
-
-        if (!isNaN(input.value[i])) {
-
-
-            alert("La paraula no pot contenir números.")
-            return;
         }
 
+
+    } catch (error) {
+
     }
 
-    if (!input.value) {
-
-        alert("Has d’afegir una paraula per poder començar a jugar.");
+}
 
 
-    } else if (input.value.length <= 3) {
 
+const getRandomWord = async function () {
 
-        alert("La paraula ha de contenir més de 3 caràcters.");
-
-
-    } else {
-
-        hiddenWord = input.value.toUpperCase();
+    try {
+        const idioma = navigator.language
+        const idiomaBase = idioma.split("-")[0];
+        const resposta = await fetch(`http://127.0.0.1:8000/api/random/word/${idiomaBase}`);
+        const objJson = await resposta.json();
+        hiddenWord = objJson.name.toUpperCase();
+        console.log(hiddenWord);
         loadSecretWord();
         title.textContent = shownWord.join(" ");
         disableButtonInput();
+
+
+    } catch (error) {
+
     }
+
 
 
 
@@ -302,18 +429,19 @@ const checkWord = function () {
 
 // OBJ PLAYER
 const player = {
-    name: getValueCookies("name") ,
+    name: getValueCookies("name"),
     points: 0,
     games: 0,
     wonGames: 0,
-    bestScore: "No hi a puntuacio"
+    bestScore: 0
 }
 
 
 
 //ADDEVENTLISTENERS
-butnTornarObj.addEventListener("click", function () {
+butnTornarObj.addEventListener("click",  function () {
 
+    updateRecord(false);
     getBack();
 
 
@@ -334,22 +462,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-eyeBtn.addEventListener("click", function () {
-    if (input.type === "password") {
-        input.type = "text";
-        eyeBtn.textContent = "🙈";
-    } else {
-        input.type = "password";
-        eyeBtn.textContent = "👁️";
-    }
-});
+
 
 startGameBtnObj.addEventListener("click", function () {
 
+
     enableAllLetters();
-    checkWord();
+    getRandomWord();
     resetPoints();
     resetTitleColor();
 
 });
+
+
 
