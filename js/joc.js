@@ -7,7 +7,7 @@ const butnTornarObj = document.querySelector(".tornar");
 const btnInstruccionsObj = document.querySelector(".instruccions");
 const scoreboardSpanObj = document.querySelector(".scoreboard span");
 const alphabet = document.querySelector(".alphabet");
-const spanIdiomaObj = document.querySelector("header span")
+
 const input = document.querySelector(".input-container input");
 const eyeBtn = document.querySelector(".input-container button");
 const startGameBtnObj = document.getElementById("startGame");
@@ -17,6 +17,7 @@ const totalPartides = document.querySelector('.totalPartides');
 const partidesGuanyades = document.querySelector('.partidesGuanyades');
 const partidaMesPunts = document.querySelector('.partidaMesPunts');
 const img = document.querySelector("img");
+const contador = document.querySelector(".contador");
 const bodyGame = document.body;
 
 
@@ -30,6 +31,8 @@ let streak = 0;
 let found = false;
 let count = 1; //image
 let oldGame = false;
+let tiempo = 30;
+let intervalo = null;
 
 //DEFINIR FUNCIONS
 const help = async function () {
@@ -38,6 +41,42 @@ const help = async function () {
     window.open("instruccions.html", "Instruccions", "width=400,height=400");
 
 }
+
+
+
+const stopCountDown = function () {
+    if (intervalo) {
+        clearInterval(intervalo);
+        intervalo = null;
+    }
+}
+
+
+const countDown = function () {
+
+
+    tiempo = 30;
+    stopCountDown();
+
+
+    intervalo = setInterval(() => {
+        let minutos = Math.floor(tiempo / 60);
+        let segundos = tiempo % 60;
+
+        contador.textContent =
+            `${minutos}:${segundos.toString().padStart(2, "0")}`;
+
+        tiempo--;
+
+        if (tiempo < 0) {
+            clearInterval(intervalo);
+            contador.textContent = "00:00";
+            loseGame();
+        }
+    }, 1000);
+}
+
+
 
 
 
@@ -286,6 +325,7 @@ const resetPoints = function () {
 
 const winGame = function () {
 
+    stopCountDown();
     count = 1;
     totalPartides.textContent = ++player.games;
     partidesGuanyades.textContent = ++player.wonGames;
@@ -319,12 +359,15 @@ const winGame = function () {
 
 const loseGame = function () {
 
+    stopCountDown();
+
     totalPartides.textContent = ++player.games;
     title.style.backgroundColor = "#ff0000ff";
     count = 1;
     showWord();
     disableAllLetters();
     enableInputGameButton();
+
 
 
     if (!oldGame) {
@@ -439,7 +482,7 @@ const player = {
 
 
 //ADDEVENTLISTENERS
-butnTornarObj.addEventListener("click",  function () {
+butnTornarObj.addEventListener("click", function () {
 
     updateRecord(false);
     getBack();
@@ -471,6 +514,7 @@ startGameBtnObj.addEventListener("click", function () {
     getRandomWord();
     resetPoints();
     resetTitleColor();
+    countDown();
 
 });
 
